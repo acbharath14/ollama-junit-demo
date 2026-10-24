@@ -1,0 +1,11 @@
+Write a JUnit 5 test class for the Java class below.
+
+Rules:
+- Package: com.bharath.qa.pricing. Class name: PricingServiceGeneratedTest.
+- Use only org.junit.jupiter.api.Assertions (assertEquals with a delta for doubles, assertThrows). No other test libraries.
+- Cover the happy paths (subtotal, each tier's discount, the GOLD 200 threshold, total with tax) and the edge cases (empty cart, negative price, non-positive quantity, null arguments).
+- Test method names must state the behavior and the expected outcome in plain words, for example goldDiscountIsFifteenPercentAtThreshold.
+- Output ONLY the Java code, inside one ```java fenced block. No explanations outside the block.
+
+Source code:
+{source}

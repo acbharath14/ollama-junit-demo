@@ -1,0 +1,7 @@
+target/
+allure-results/
+*.class
+.idea/
+*.iml
+.DS_Store
+__pycache__/
