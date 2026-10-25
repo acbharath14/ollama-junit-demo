@@ -118,11 +118,48 @@ what the model's tests added.
 
 ## Continuous integration
 
-The GitHub Actions workflow (`.github/workflows/ci.yml`) runs `mvn test`
-on every push and pull request and uploads the three reports as
-artifacts (Surefire output, JaCoCo HTML, Allure raw results). CI runs
-only the hand-written suite: the generator needs a local Ollama model,
-so it stays a local step.
+CI is not wired up yet: this repo has no `.github/workflows/ci.yml`.
+Workflow files cannot be pushed through the GitHub App API, so the
+workflow must be added through the GitHub web UI (Actions → New
+workflow → "set up a workflow yourself", commit as
+`.github/workflows/ci.yml`):
+
+```yaml
+name: ollama-junit-demo
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Run hand-written suite
+        run: mvn test
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/
+            target/allure-results/
+```
+
+Once added, CI runs `mvn test` on every push and pull request and
+uploads the three reports as artifacts (Surefire output, JaCoCo HTML,
+Allure raw results). CI runs only the hand-written suite: the generator
+needs a local Ollama model, so it stays a local step.
 
 ## Notes
 
