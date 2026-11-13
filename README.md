@@ -8,12 +8,13 @@ on `localhost:11434` and the tests run with Maven.
 
 ## The app
 
-`src/main/java/com/bharath/qa/pricing/` holds a tiny, pure pricing module —
-no files, no network, no database, which is what makes it easy to unit test:
+`src/main/java/com/bharath/qa/pricing/` holds a tiny, pure pricing module.
+It touches no files, no network, and no database, which is what makes it
+easy to unit test:
 
-- `LineItem` — one cart line: sku, unit price, quantity.
-- `CustomerTier` — BRONZE, SILVER, GOLD.
-- `PricingService` — subtotal, tier discount, and total with tax.
+- `LineItem`: one cart line: sku, unit price, quantity.
+- `CustomerTier`: BRONZE, SILVER, GOLD.
+- `PricingService`: subtotal, tier discount, and total with tax.
 
 Discount rules: GOLD gets 15% when the subtotal is 200 or more, otherwise
 10%; SILVER gets 5%; BRONZE gets none. Total = (subtotal − discount) ×
@@ -73,14 +74,14 @@ the suite until you move it.
 Every `mvn test` run produces three reports. No extra command is needed
 to generate them; the commands below are only for viewing.
 
-**Execution — Surefire (plain text, always available).**
+**Execution: Surefire (plain text, always available).**
 One `.txt` file per test class, plus XML for tooling:
 
 ```sh
 ls target/surefire-reports/
 ```
 
-**Execution — Allure (HTML, the readable one).**
+**Execution: Allure (HTML, the readable one).**
 The run writes raw results to `target/allure-results/`. Render them with
 the Allure command line (install once: `brew install allure` on macOS,
 or download it from the Allure releases page):
@@ -91,7 +92,7 @@ allure serve target/allure-results
 
 This opens a report with every test case, its steps, and pass/fail status.
 
-**Coverage — JaCoCo (HTML).** Open this file in a browser:
+**Coverage: JaCoCo (HTML).** Open this file in a browser:
 
 ```sh
 open target/site/jacoco/index.html
@@ -109,57 +110,21 @@ what the model's tests added.
 
 ## How it is laid out
 
-- `src/main/java/.../pricing/` — the app under test.
-- `src/test/java/.../pricing/PricingServiceTest.java` — hand-written baseline tests.
-- `scripts/generate_tests.py` — the Ollama client (standard library only).
-- `scripts/prompt_template.txt` — the prompt sent to the model; edit it to
+- `src/main/java/.../pricing/`: the app under test.
+- `src/test/java/.../pricing/PricingServiceTest.java`: hand-written baseline tests.
+- `scripts/generate_tests.py`: the Ollama client (standard library only).
+- `scripts/prompt_template.txt`: the prompt sent to the model; edit it to
   change what gets generated.
-- `ai-generated/` — staging area for drafts, never compiled.
+- `ai-generated/`: staging area for drafts, never compiled.
 
 ## Continuous integration
 
-CI is not wired up yet: this repo has no `.github/workflows/ci.yml`.
-Workflow files cannot be pushed through the GitHub App API, so the
-workflow must be added through the GitHub web UI (Actions → New
-workflow → "set up a workflow yourself", commit as
-`.github/workflows/ci.yml`):
+CI runs on GitHub Actions (`.github/workflows/ci.yml`). It runs `mvn test`
+on every push to `main` and on pull requests, then uploads the three
+reports as artifacts (Surefire output, JaCoCo HTML, Allure raw results).
 
-```yaml
-name: ollama-junit-demo
-
-"on":
-  push:
-    branches: [main]
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-          cache: maven
-      - name: Run hand-written suite
-        run: mvn test
-      - name: Upload reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: |
-            target/surefire-reports/
-            target/site/jacoco/
-            target/allure-results/
-```
-
-Once added, CI runs `mvn test` on every push and pull request and
-uploads the three reports as artifacts (Surefire output, JaCoCo HTML,
-Allure raw results). CI runs only the hand-written suite: the generator
-needs a local Ollama model, so it stays a local step.
+CI runs only the hand-written suite: the generator needs a local Ollama
+model, so it stays a local step.
 
 ## Notes
 
